@@ -1,0 +1,36 @@
+.user-icon {
+  font-size: 100px;
+
+}
+.container {
+  margin-top: 100px; 
+
+}
+.buttons-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.settings-button,
+.change-password-button {
+  margin-top: 30px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.settings-button:hover,
+.change-password-button:hover {
+  background-color: #0056b3;
+}
+
+.settings-icon,
+.change-password-icon {
+  margin-right: 10px;
+}

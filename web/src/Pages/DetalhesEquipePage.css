@@ -1,0 +1,29 @@
+.nome {
+  margin-bottom: 10px;
+  margin-left: 300px;
+  display: flex;
+  align-items: center;
+}
+
+.ver-mais {
+  background-color: white;
+  color: black;
+  
+  border-radius: 10px;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-left: 10px;
+  margin-right: 400px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.ver-mais:hover {
+  background-color: #21b485;
+  text-decoration: none;
+}
+
+.nome .ver-mais {
+  margin-left: auto;
+}

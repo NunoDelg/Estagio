@@ -1,0 +1,54 @@
+.user-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.user-container-wrapper {
+  display: flex;
+  flex-direction: row;
+  width: 60%;
+  justify-content: space-between;
+}
+.user span {
+  font-size: 18px;
+  color: #333;
+  margin-right: 200px;
+}
+.button2 {
+  background-color: #21b485;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 8px;
+  border-bottom: none !important; 
+}
+
+.action-buttons {
+  align-items: center;
+}
+
+.action-buttons button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.action-buttons button:hover {
+  color: red;
+}
+.container {
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+.button-container {
+  margin-bottom: 19px;
+}
+
+.action-buttons button svg {
+  width: 18px;
+  height: 18px;
+}

@@ -1,0 +1,54 @@
+.detalhes-container {
+  margin: 100px;
+}
+
+.nome-departamento {
+  margin-bottom: 25px; 
+}
+
+.quadros-container {
+  display: flex;
+  justify-content: center;
+}
+
+.quadro {
+  margin: 30px;
+  margin-right: 250px;
+}
+.quadro .table-custom {
+  border-collapse: collapse;
+  width: 170%; 
+}
+.table-custom th,
+.table-custom td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.table-custom th {
+  background-color: #f2f2f2;
+}
+
+.table-custom tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.table-custom tr:hover {
+  background-color: #ddd;
+}
+
+.table-custom td:first-child {
+  text-align: center;
+}
+
+
+.total-horas {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.total-horas-text {
+  font-weight: bold;
+}
