@@ -24,14 +24,14 @@ const LoginPage = () => {
     console.log(password);
 
     try {
-      const response = await fetch("http://192.168.0.149:3000/auth/login", {
+      const response = await fetch("http://192.168.0.152:3000/more-api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Email,
-          Password,
+          email: email,
+          password: password,
         }),
       });
 
