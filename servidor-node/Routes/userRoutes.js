@@ -16,16 +16,16 @@ module.exports = (mysqlDB) => {
   });
 
   router.post("/register", async (req, res) => {
-    const { name, lastname, phone, email, password } = req.body;
+    const { nome, apelido, email, password } = req.body;
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const query = `INSERT INTO Users (Name, LastName, Phone, Email, PasswordHash) VALUES (?, ?, ?, ?, ?)`;
+    const query = `INSERT INTO Users (Nome, Apelido, Email, Password) VALUES (?, ?, ?, ?)`;
 
     mysqlDB.query(
       query,
-      [name, lastname, phone, email, hashedPassword],
+      [nome, apelido, email, hashedPassword],
       (error, results) => {
         if (error) {
           console.error(error);
@@ -60,7 +60,7 @@ module.exports = (mysqlDB) => {
     );
   });
 
-  router.delete("/:id", authenticateToken, (req, res) => {
+  router.delete("/:id", (req, res) => {
     const { id } = req.params;
 
     mysqlDB.query("DELETE FROM Users WHERE UserID=?", [id], (error) => {

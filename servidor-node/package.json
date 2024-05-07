@@ -1,0 +1,15 @@
+{
+  "name": "registo-ponto-more-api",
+  "version": "1.0.0",
+  "description": "backend para o registo de ponto do More",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1"
+  }
+}
