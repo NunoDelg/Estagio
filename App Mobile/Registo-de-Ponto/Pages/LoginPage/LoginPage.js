@@ -1,3 +1,4 @@
+import { URL } from "../../conf";
 import React, { useState } from "react";
 import {
   View,
@@ -19,21 +20,23 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    console.log("Botão de login pressionado");
-    console.log(email);
-    console.log(password);
-
     try {
-      const response = await fetch("http://192.168.0.149:3000/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          Email,
-          Password,
-        }),
-      });
+      console.log("Tentativa de login...");
+
+      const response = await fetch(
+        `http://${URL}:3000/more-api/login`,
+
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
@@ -41,8 +44,11 @@ const LoginPage = () => {
 
       const responseData = await response.json();
 
-      if (responseData.success) {
+      // Verifica se o login foi bem-sucedido
+      if (response.status === 200) {
+        // Salva o token de autenticação no AsyncStorage
         await AsyncStorage.setItem("token", responseData.token);
+        // Navega para a página "QRScanPage" após o login bem-sucedido
         navigation.navigate("QRScanPage");
       } else {
         Alert.alert("Erro", responseData.message);

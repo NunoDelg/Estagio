@@ -9,16 +9,7 @@ dotenv.config();
 const app = express();
 const port = 3000;
 
-// Configurando o CORS
-const corsOptions = {
-  origin: "http://192.168.0.149",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders:
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-};
-
-// Aplicando as configurações do CORS
-app.use(cors(corsOptions));
+app.use(cors());
 
 // Parsear requisições do tipo application/json
 app.use(bodyParser.json());
@@ -35,7 +26,7 @@ app.use((err, req, res, next) => {
   res.status(500).send("Erro interno do servidor");
 });
 
-// Iniciar o servidor
+/// Iniciar o servidor
 app.listen(port, () => {
   console.log(`Servidor está rodando na porta ${port}`);
 });
