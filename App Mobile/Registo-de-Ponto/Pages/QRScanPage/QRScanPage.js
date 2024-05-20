@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { CameraView, Camera } from "expo-camera/next";
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+} from "react-native";
+import { Camera } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import QRSuccessPage from "../QRSuccessPage/QRSuccessPage";
+import { BarCodeScanner } from "expo-barcode-scanner";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { URL } from "../../conf";
 
-const QRScanPage = () => {
+const QRScanPage = ({ route }) => {
+  console.log("route", route.params.Users_idUsers);
   const getCurrentDateTime = () => {
     const currentDateTime = new Date();
     return currentDateTime.toLocaleString();
@@ -16,23 +26,74 @@ const QRScanPage = () => {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [scannedData, setScannedData] = useState(null);
   const [hasPermission, setHasPermission] = useState(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const userIdFromLocalStorage = route.params.Users_idUsers;
 
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === "granted");
+      console.log("Permissão da câmera:", status);
     })();
   }, []);
 
-  const handleScannerOpen = () => {
+  const handleScannerOpen = async () => {
     setIsCameraOpen(true);
+    console.log("Scanner aberto.");
   };
 
-  const handleBarCodeScanned = ({ data }) => {
+  const handleBarCodeScanned = async ({ type, data }) => {
+    console.log("Código QR escaneado:", data);
     setScannedData(data);
     setIsCameraOpen(false);
-    setShowSuccessModal(true);
+    //const userId = await getUserIdFromLocalStorage();
+    //setUserIdFromLocalStorage(userId);
+    await registrarAutomaticamente(data);
+  };
+  // const getUserIdFromLocalStorage = async () => {
+  //   try {
+  //     const Users_idUsers = await AsyncStorage.getItem("Users_idUsers");
+  //     console.log("Obtido userId do armazenamento local:", Users_idUsers);
+  //     return Users_idUsers;
+  //   } catch (error) {
+  //     console.error("Erro ao obter o userId do armazenamento local:", error);
+  //     return null;
+  //   }
+  // };
+
+  const registrarAutomaticamente = async (token) => {
+    try {
+      console.log("Enviando token:", token);
+      console.log("UserID:", userIdFromLocalStorage);
+      const response = await fetch(
+        `${URL}/more-api/users/verify-token/${userIdFromLocalStorage}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            qr_data: token,
+            Saida: "#",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const responseData = await response.json();
+        console.error("Erro na resposta da API:", responseData);
+        throw new Error(responseData.message || "Erro ao marcar presença.");
+      }
+      console.log("Presença marcada com sucesso.");
+      Alert.alert("Sucesso", "Presença marcada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao enviar o token:", error.message);
+      let errorMessage = "Ocorreu um erro ao tentar enviar o token.";
+      if (error instanceof TypeError && error.message === "Falha na conexão") {
+        errorMessage =
+          "Falha na conexão. Por favor, verifique sua conexão com a internet e tente novamente.";
+      }
+      Alert.alert("Erro", errorMessage);
+    }
   };
 
   const handleUserButtonPress = () => {
@@ -43,13 +104,15 @@ const QRScanPage = () => {
     navigation.navigate("HistoricoPage");
   };
 
+  if (hasPermission === null) {
+    return <View />;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
   return (
     <View style={styles.container}>
-      <QRSuccessPage
-        visible={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-      />
-
       <View style={styles.upperSection}>
         <Text style={[styles.text, styles.loginText]}>Bem-vindo</Text>
         <Text style={[styles.text, styles.dateTimeText]}>
@@ -98,10 +161,10 @@ const QRScanPage = () => {
         </View>
       ) : (
         <>
-          <CameraView
-            onBarcodeScanned={handleBarCodeScanned}
-            barcodeScannerSettings={{
-              barcodeTypes: ["qr"],
+          <Camera
+            onBarCodeScanned={handleBarCodeScanned}
+            barCodeScannerSettings={{
+              barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
             }}
             style={StyleSheet.absoluteFillObject}
           />
@@ -139,9 +202,9 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: "Roboto",
   },
-   loginText: {
-     fontSize: 24,
-     fontWeight: "bold",
+  loginText: {
+    fontSize: 24,
+    fontWeight: "bold",
   },
   dateTimeText: {
     fontSize: 18,

@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import QRCode from "qrcode.react";
 import Modal from "react-modal";
+import { URL } from "./conf";
 import logo from "../imagem/logohorizontal.png";
 import { useHistory } from "react-router-dom";
 import "./GerarQRCodePage.css";
@@ -23,11 +24,26 @@ const GerarQRCodePage = () => {
   const history = useHistory();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleGenerateQRCode = () => {
-    const qrData = "TokenFixo123456789";
-    setQrData(qrData);
-    setIsModalOpen(true);
-    history.push("/gerar-qrcode");
+  const handleGenerateQRCode = async () => {
+    console.log("Gerando QR Code...");
+    try {
+      const response = await fetch(`${URL}/more-api/users/gerar-qr-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Erro ao gerar QR code");
+      }
+      const token = await response.text();
+      console.log("Token gerado:", token);
+      setQrData(token);
+      setIsModalOpen(true);
+      history.push("/gerar-qrcode");
+    } catch (error) {
+      console.error("Erro ao gerar QR code:", error);
+    }
   };
 
   const handleModalClose = () => {
