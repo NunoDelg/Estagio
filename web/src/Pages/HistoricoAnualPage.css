@@ -1,0 +1,40 @@
+.anos-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 10px;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  
+  .ano-button {
+    width: 60px;
+    height: 60px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  
+  .ano-button.com-registros {
+    background-color: #4caf50; 
+    color: white;
+  }
+  
+  
+  .ano-button.sem-registros {
+    background-color: #d3d3d3; 
+    color: #808080;
+    cursor: not-allowed;
+  }
+  
+  
+  .ano-button.com-registros:hover {
+    background-color: #388e3c; 
+  }
+  

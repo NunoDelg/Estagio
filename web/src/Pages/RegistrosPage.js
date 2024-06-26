@@ -32,7 +32,7 @@ const RegistrosPage = () => {
   };
 
   const handleHistoryClick = () => {
-    history.push("/historico");
+    history.push("/registo-agrupado");
   };
 
   const handleUsersClick = () => {

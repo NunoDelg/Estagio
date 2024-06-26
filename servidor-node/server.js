@@ -20,14 +20,14 @@ const mysqlDB = mysql.createPool({
 
 // Configurando o CORS
 const corsOptions = {
-  origin: "http://192.168.0.149",
+  origin: "http://127.0.0.0",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders:
     "Origin, X-Requested-With, Content-Type, Accept, Authorization",
 };
 
 // Aplicando as configurações do CORS
-app.use(cors(corsOptions));
+app.use(cors());
 
 // Parsear requisições do tipo application/json
 app.use(bodyParser.json());

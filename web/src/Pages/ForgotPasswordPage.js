@@ -8,6 +8,8 @@ import "./ForgotPasswordPage.css";
 const ForgotPasswordPage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [email, setEmail] = useState(""); 
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
   const history = useHistory();
 
   const handleMenuClick = () => {
@@ -30,9 +32,18 @@ const ForgotPasswordPage = () => {
     setEmail(e.target.value);
   };
 
+  const handleCodeChange = (e) => {
+    setVerificationCode(e.target.value);
+  };
+
   const handleSubmit = () => {
     console.log("Enviar código para:", email);
-    history.push("/create-new-password"); 
+    setShowCodeModal(true);
+  };
+
+  const handleCodeSubmit = () => {
+    console.log("Código de verificação:", verificationCode);
+    history.push("/create-new-password");
   };
 
   return (
@@ -90,6 +101,23 @@ const ForgotPasswordPage = () => {
           Enviar Código
         </button>
       </div>
+
+      {showCodeModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>Insira o código de verificação</h2>
+            <input
+              type="text"
+              placeholder="Código de verificação"
+              value={verificationCode}
+              onChange={handleCodeChange}
+            />
+            <button className="submit-button" onClick={handleCodeSubmit}>
+              Confirmar Código
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

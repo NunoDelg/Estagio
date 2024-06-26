@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { FaUserCircle, FaQrcode, FaSignOutAlt } from "react-icons/fa";
+import axios from "axios";
 import logo from "../imagem/logohorizontal.png";
 import logo1 from "../imagem/Logotipo_Completo.png";
 import "./CreateNewPasswordPage.css";
@@ -35,14 +36,17 @@ const CreateNewPasswordPage = () => {
     history.push("/");
   };
 
-  const handleSubmit = () => {
-    console.log("Nova senha:", novaSenha);
-
-    if (novaSenha === confirmarSenha) {
-      alert("Senha criada com sucesso!");
-      history.push("/");
-    } else {
-      alert("As senhas não coincidem. Por favor, tente novamente.");
+  const handleSubmit = async () => {
+    try {
+      if (novaSenha === confirmarSenha) {
+        await axios.post("/reset-password", { novaSenha });
+        alert("Senha alterada com sucesso!");
+        history.push("/");
+      } else {
+        alert("As senhas não coincidem. Por favor, tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao redefinir senha:", error);
     }
   };
 

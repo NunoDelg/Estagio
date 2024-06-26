@@ -1,17 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useHistory } from "react-router-dom";
-import {
-  FaUserCircle,
-  FaQrcode,
-  FaSignOutAlt,
-  FaAngleDown,
-  FaChevronLeft,
-} from "react-icons/fa";
+import { FaUserCircle, FaQrcode, FaSignOutAlt, FaAngleDown, FaChevronLeft } from "react-icons/fa";
 import logo from "../imagem/logohorizontal.png";
 import "../Pages/DetalhesEquipePage.css";
 import { URL } from "../Pages/conf";
 
-const DetalhesEquipePage = () => {
+const DetalheEquipeAgrupado = () => {
   const { departamento } = useParams();
   const [menuOpen, setMenuOpen] = useState(false);
   const [usuarios, setUsuarios] = useState([]);
@@ -50,6 +44,7 @@ const DetalhesEquipePage = () => {
   const handleGenerateQRCode = () => {
     history.push("/gerar-qrcode");
   };
+
   const handleGoBack = () => {
     history.goBack("/RegistosEquipesPage");
   };
@@ -108,17 +103,15 @@ const DetalhesEquipePage = () => {
       <h1>{departamento}</h1>
       <div className="nomes-container">
         {usuariosPorDepartamento.map((user, index) => {
-          console.log("User:", user);
+          console.log("User historico:", user.idUsers);
           return (
             <div key={index} className="nome">
               <span>{user.Nome}</span>
               <Link
-                to={`/detalhes/${user.idUsers}/${encodeURIComponent(
-                  user.Nome
-                )}/${departamento}`}
+                to={`/historico-anual?idUsers=${encodeURIComponent(user.idUsers)}`}
                 className="ver-mais"
               >
-                Ver Mais <FaAngleDown />
+                Historico <FaAngleDown />
               </Link>
             </div>
           );
@@ -128,4 +121,4 @@ const DetalhesEquipePage = () => {
   );
 };
 
-export default DetalhesEquipePage;
+export default DetalheEquipeAgrupado;

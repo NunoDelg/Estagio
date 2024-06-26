@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../imagem/logohorizontal.png";
 import {
   FaEdit,
@@ -6,16 +6,38 @@ import {
   FaUserCircle,
   FaQrcode,
   FaSignOutAlt,
+  FaChevronLeft,
   FaUserPlus,
 } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
 import "./UtilizadoresPage.css";
+import { URL } from "../Pages/conf";
 
 const UtilizadoresPage = () => {
+  const [usuarios, setUsuarios] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const history = useHistory();
+
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const response = await fetch(`${URL}/more-api/users/usuarios`);
+        const data = await response.json();
+        console.log("Response data:", data);
+        if (response.ok) {
+          setUsuarios(data);
+        } else {
+          console.error("Erro ao buscar usuários:", data.message);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar usuários:", error);
+      }
+    };
+
+    fetchUsuarios();
+  }, []);
 
   const handleMenuClick = () => {
     setMenuOpen(!menuOpen);
@@ -26,9 +48,22 @@ const UtilizadoresPage = () => {
     setShowModal(true);
   };
 
-  const handleConfirmDelete = () => {
-    console.log("Usuário deletado:", selectedUser);
-    setShowModal(false);
+  const handleConfirmDelete = async () => {
+    try {
+      const response = await fetch(`${URL}/more-api/users/${selectedUser.idUsers}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Usuário deletado com sucesso:", data);
+        setUsuarios(usuarios.filter(user => user.idUsers !== selectedUser.idUsers));
+        setShowModal(false);
+      } else {
+        console.error("Erro ao deletar usuário:", data.message);
+      }
+    } catch (error) {
+      console.error("Erro ao deletar usuário:", error);
+    }
   };
 
   const handleCancelDelete = () => {
@@ -46,63 +81,22 @@ const UtilizadoresPage = () => {
   const handleGenerateQRCode = () => {
     history.push("/gerar-qrcode");
   };
+  const handleGoBack = () => {
+    history.goBack("/RegistrosPage");
+  };
 
   const handleEditUser = (usuario) => {
+    console.log("editar", usuario);
     history.push(`/editar-utilizador/${encodeURIComponent(usuario)}`);
   };
 
-  const departamentos = {
-    DO: [
-      "Ana Luísa Machado",
-      "Cátia Vale",
-      "Vanessa Afonso",
-      "Sofia Nunes",
-      "Luciana Cabeceiro Silva",
-      "Ana Oliveira",
-      "Inês Campello",
-      "Alberto Teixeira",
-    ],
-    BIOB: [
-      "Ermelinda Silva",
-      "Luís Rocha",
-      "Natércia Fernandes",
-      "Luana Fernandes",
-      "João Pinto",
-      "Ana Paula Pereira",
-      "Alexandre Gonçalves",
-    ],
-    ECO: [
-      "Carolina Campos",
-      "Susana Araújo",
-      "José Filho",
-      "Sara Rodrigues",
-      "Silvana Costa",
-      "Daniel de Figueiredo",
-      "Tânia Marques",
-    ],
-    PTB: ["Carolina Carvalho", "Patrícia Cordeiro"],
-    TECH: [
-      "Nuno Delgado",
-      "Ricardo Freitas",
-      "Khadija Sabiri",
-      "Estefânia Gonçalves",
-      "Tiago Franca",
-      "Gustavo Vieira",
-      "Elisabete Freitas",
-      "Gonçalo Silva",
-      "Caio Camargo",
-      "Rui Fernandes",
-      "Higor Rosse",
-      "Leandro Santos",
-    ],
-    PVC: [
-      "Maria Seixas",
-      "Bárbara Matias",
-      "Natacha Pinto",
-      "José Francisco",
-      "Luís Silva",
-    ],
-  };
+  const usuariosPorDepartamento = usuarios.reduce((acc, curr) => {
+    if (!acc[curr.Nome_Departamento]) {
+      acc[curr.Nome_Departamento] = [];
+    }
+    acc[curr.Nome_Departamento].push(curr);
+    return acc;
+  }, {});
 
   return (
     <div>
@@ -144,42 +138,49 @@ const UtilizadoresPage = () => {
           )}
         </div>
       </nav>
-
-      {Object.entries(departamentos).map(([departamento, usuarios]) => (
-        <div key={departamento} className="container">
-          <h1>{departamento}</h1>
-          <div className="button-container">
-            <button className="button2" onClick={() => history.push("/adicionar-conta")}>
-              <FaUserPlus
-                style={{ marginRight: "5px" }}
-              />
-              Adicionar Conta
-            </button>
-          </div>
-          <div className="user-container">
-            {usuarios.map((usuario, index) => (
-              <div className="user-container-wrapper" key={index}>
-                <div className="user-info">
-                  <span>{usuario}</span>
+      <div className="go-back-button-container">
+        <button className="back-button" onClick={handleGoBack}>
+          <FaChevronLeft />
+        </button>
+      </div>    
+      {Object.entries(usuariosPorDepartamento).map(
+        ([departamento, usuarios]) => (
+          <div key={departamento} className="container">
+            <h1>{departamento}</h1>
+            <div className="button-container">
+              <button
+                className="button2"
+                onClick={() => history.push("/adicionar-conta")}
+              >
+                <FaUserPlus style={{ marginRight: "5px" }} />
+                Adicionar Conta
+              </button>
+            </div>
+            <div className="user-container">
+              {usuarios.map((user, index) => (
+                <div className="user-container-wrapper" key={index}>
+                  <div className="user-info">
+                    <span>{user.Nome}</span>
+                  </div>
+                  <div className="action-buttons">
+                    <button onClick={() => handleEditUser(user.idUsers)}>
+                      <FaEdit />
+                    </button>
+                    <button onClick={() => handleDeleteUser(user)}>
+                      <FaTrashAlt />
+                    </button>
+                  </div>
                 </div>
-                <div className="action-buttons">
-                  <button onClick={() => handleEditUser(usuario)}>
-                    <FaEdit />
-                  </button>
-                  <button onClick={() => handleDeleteUser(usuario)}>
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      )}
 
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <p>Tens a certeza que pretende eliminar? {selectedUser}?</p>
+            <p>Tens a certeza que pretende eliminar? {selectedUser?.Nome}?</p>
             <div className="modal-buttons">
               <button className="no-button" onClick={handleCancelDelete}>
                 Não

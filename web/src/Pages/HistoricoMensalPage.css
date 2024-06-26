@@ -1,0 +1,97 @@
+.historico-mensal-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.historico-mensal-container .welcome-text {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.historico-mensal-container .navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.historico-mensal-container .image-container img {
+  height: 50px;
+}
+
+.historico-mensal-container .navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.historico-mensal-container .menu-icon {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.historico-mensal-container .menu-options {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 20px;
+  top: 60px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.historico-mensal-container .menu-option {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.historico-mensal-container .menu-option .menu-icon {
+  margin-right: 8px;
+}
+
+.historico-mensal-container .go-back-button-container {
+  text-align: left;
+}
+
+.historico-mensal-container .back-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.historico-mensal-container .meses-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.historico-mensal-container .mes-button {
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+}
+
+.historico-mensal-container .mes-button.com-registros {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.historico-mensal-container .mes-button.sem-registros {
+  background-color: #e0e0e0;
+  color: #888;
+}
+
+.historico-mensal-container .mes-button:disabled {
+  cursor: not-allowed;
+}

@@ -7,6 +7,7 @@ import {
   FaArrowDown,
   FaFilePdf,
   FaUserCircle,
+  FaChevronLeft,
   FaSignOutAlt,
 } from "react-icons/fa";
 import QRCode from "qrcode.react";
@@ -65,6 +66,9 @@ const GerarQRCodePage = () => {
   const handleVoltar = () => {
     setIsModalOpen(false);
   };
+  const handleGoBack = () => {
+    history.goBack("/RegistrosPage");
+  };
 
   return (
     <div>
@@ -108,6 +112,11 @@ const GerarQRCodePage = () => {
           )}
         </div>
       </nav>
+      <div className="go-back-button-container">
+        <button className="back-button" onClick={handleGoBack}>
+          <FaChevronLeft />
+        </button>
+      </div>
       <div className="content">
         <button className="generate-button" onClick={handleGenerateQRCode}>
           <FaQrcode className="button-icon" />

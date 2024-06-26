@@ -17,25 +17,17 @@ const LoginPage = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
-        credentials: 'include',
       });
 
-      const responseText = await response.text();
-      let responseData;
-
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (error) {
-        console.error("Erro ao fazer o parse do JSON:", error);
-        console.log("Resposta recebida:", responseText);
-        throw new Error("Resposta do servidor não é um JSON válido");
-      }
+      const responseData = await response.json();
 
       console.log(responseData);
-
+      localStorage.setItem("id", responseData.id);
       if (!response.ok) {
         throw new Error(responseData.message || "Erro de rede");
       }
+      localStorage.setItem("id", responseData.id);
+      localStorage.setItem("userName", responseData.Nome);
 
       if (response.status === 200) {
         if (responseData) {
