@@ -8,7 +8,7 @@ require("dotenv").config();
 
 module.exports = (mysqlDB) => {
   // Rota para verificar o token
-  router.post("/verify-token/:userId", async (req, res) => {
+  router.post("/verify-token/:idUsers", async (req, res) => {
     const { qr_data } = req.body;
     const { userId } = req.params;
 

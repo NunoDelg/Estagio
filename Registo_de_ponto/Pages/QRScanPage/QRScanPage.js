@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, TouchableOpacity, Image, Alert, StyleSheet } from "react-native";
-import { Camera } from "expo-camera";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Alert,
+  StyleSheet,
+  Modal,
+} from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { BarCodeScanner } from "expo-barcode-scanner";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { URL } from "../../conf";
+import moment from "moment";
+import QRSuccessPage from "../QRSuccessPage/QRSuccessPage";
 
 const QRScanPage = ({ route }) => {
   const getCurrentDateTime = () => {
@@ -17,18 +26,20 @@ const QRScanPage = ({ route }) => {
 
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [scannedData, setScannedData] = useState(null);
-  const [hasPermission, setHasPermission] = useState(null);
-  const userIdFromLocalStorage = route.params.Users_idUsers;
+  const [hasPermission, requestPermission] = useCameraPermissions();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const idUsersFromLocalStorage = route.params.Users_idUsers;
 
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-      console.log("Permissão da câmera:", status);
+      const { status } = await requestPermission();
+      if (status !== "granted") {
+        Alert.alert("Erro", "Permissão de câmera não concedida");
+      }
     })();
   }, []);
 
-  const handleScannerOpen = async () => {
+  const handleScannerOpen = () => {
     setIsCameraOpen(true);
     console.log("Scanner aberto.");
   };
@@ -36,16 +47,23 @@ const QRScanPage = ({ route }) => {
   const handleBarCodeScanned = async ({ type, data }) => {
     console.log("Código QR escaneado:", data);
     setScannedData(data);
+    console.log("Escaneado com sucesso, fechando a câmera...");
     setIsCameraOpen(false);
-    await registrarAutomaticamente(data);
+    try {
+      console.log("Iniciando registro automático...");
+      await registrarAutomaticamente(data);
+      console.log("Registro automático concluído.");
+    } catch (error) {
+      console.error("Erro durante o registro automático:", error);
+    }
   };
 
   const registrarAutomaticamente = async (token) => {
     try {
       console.log("Enviando token:", token);
-      console.log("UserID:", userIdFromLocalStorage);
+      console.log("UserID:", idUsersFromLocalStorage);
       const response = await fetch(
-        `${URL}/more-api/users/verify-token/${userIdFromLocalStorage}`,
+        `${URL}/more-api/users/verify-token/${idUsersFromLocalStorage}`,
         {
           method: "POST",
           headers: {
@@ -64,13 +82,12 @@ const QRScanPage = ({ route }) => {
         throw new Error(responseData.message || "Erro ao marcar presença.");
       }
       console.log("Presença marcada com sucesso.");
-      Alert.alert("Sucesso", "Presença marcada com sucesso!");
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Erro ao enviar o token:", error.message);
       let errorMessage = "Ocorreu um erro ao tentar enviar o token.";
       if (error instanceof TypeError && error.message === "Falha na conexão") {
-        errorMessage =
-          "Falha na conexão. Por favor, verifique sua conexão com a internet e tente novamente.";
+        errorMessage = "Falha na conexão";
       }
       Alert.alert("Erro", errorMessage);
     }
@@ -84,11 +101,25 @@ const QRScanPage = ({ route }) => {
     navigation.navigate("HistoricoPage");
   };
 
-  if (hasPermission === null) {
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+  };
+
+  if (!hasPermission) {
     return <View />;
   }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+
+  if (!hasPermission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: "center" }}>
+          Precisamos da sua permissão para usar a câmera
+        </Text>
+        <TouchableOpacity onPress={requestPermission} style={styles.button}>
+          <Text style={styles.buttonText}>Conceder Permissão</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
 
   return (
@@ -127,7 +158,7 @@ const QRScanPage = ({ route }) => {
               onPress={handleUserButtonPress}
             >
               <Ionicons name="person" size={36} color="black" />
-              <Text style={styles.buttonText}>Utilizador</Text>
+              <Text style={styles.iconText}>Utilizador</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -135,18 +166,16 @@ const QRScanPage = ({ route }) => {
               onPress={handleHoursButtonPress}
             >
               <Ionicons name="time" size={36} color="black" />
-              <Text style={styles.buttonText}>Histórico</Text>
+              <Text style={styles.iconText}>Histórico</Text>
             </TouchableOpacity>
           </View>
         </View>
       ) : (
         <>
-          <Camera
+          <CameraView
+            style={styles.camera}
+            type="back"
             onBarCodeScanned={handleBarCodeScanned}
-            barCodeScannerSettings={{
-              barCodeTypes: [BarCodeScanner.Constants.BarCodeType.qr],
-            }}
-            style={StyleSheet.absoluteFillObject}
           />
           <View style={styles.cameraOverlay}>
             <View style={styles.focusBox} />
@@ -154,6 +183,10 @@ const QRScanPage = ({ route }) => {
           </View>
         </>
       )}
+      <QRSuccessPage
+        visible={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+      />
     </View>
   );
 };
@@ -237,14 +270,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   cameraOverlay: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
   },
   focusBox: {
     width: 300,
@@ -253,11 +281,14 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderRadius: 10,
     backgroundColor: "transparent",
-    position: "absolute",
   },
   cameraText: {
     color: "white",
     fontSize: 18,
-    marginTop: -500,
+    position: "absolute",
+    top: "20%",
+  },
+  camera: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
